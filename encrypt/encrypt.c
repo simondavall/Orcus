@@ -9,6 +9,8 @@ const int MIN_PASSWORD_LENGTH = 8;
 bool checkFilepathLength(const char* filepath);
 bool checkPasswordLength(const char* password);
 bool checkFilenameValidChars(const char* filepvath);
+bool checkPasswordValidChars(const char* password);
+bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
 
 int main(int argc, char* argv[]){
 
@@ -31,6 +33,10 @@ int main(int argc, char* argv[]){
   }
 
   if (!checkFilenameValidChars(filepath)){
+    return 1;
+  }
+
+  if(!checkPasswordValidChars(password)){
     return 1;
   }
 
@@ -77,22 +83,63 @@ bool checkPasswordLength(const char* password){
 bool checkFilenameValidChars(const char* filepath){
 
   char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890()-./:[]_~";
+
+  return checkValid(validChars, filepath, "<filepath>");
+}
+
+bool checkPasswordValidChars(const char* password){
+
+  char excludeChars[] = "a\"\\ '`";
+  int excludeCharsLength = strlen(excludeChars);
+
+  int minChar = 32;
+  int maxChar = 127;
+
+  char buffer[maxChar];
+
+  int idx = 0;
+  bool isValidChar = true;
+
+  for (int i = minChar; i < maxChar; i++) {
+    for(int j = 0; j < excludeCharsLength; j++){
+      if(i == (int)excludeChars[j]){
+        isValidChar = false;
+        break;
+      }
+    }
+    if(isValidChar){
+      buffer[idx] = (char)i;
+      idx++;
+    }
+    isValidChar = true;
+  }
+
+  buffer[idx] = '\0';
+
+  char validChars[idx];
+  strcpy(validChars, buffer);
+
+  return checkValid(validChars, password, "<password>");
+}
+
+
+bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel){
+  int stringLength = strlen(toBeChecked);
   int validCharsLength = strlen(validChars);
-  int filepathLength = strlen(filepath);
+
   bool charValid = false;
 
-
-  for (int i = 0; i < filepathLength; i++) {
+  for (int i = 0; i < stringLength; i++) {
     charValid = false;
     for (int j = 0; j < validCharsLength; j++) {
-      if(filepath[i] == validChars[j]){
+      if(toBeChecked[i] == validChars[j]){
         charValid = true;
         break;
       }
     }
 
     if(!charValid){
-      printf("Password contains invalid characters. The following characters are valid:\n\n\t");
+      printf("%s contains invalid characters. The following characters are valid:\n\n\t", messageLabel);
       int charsPerLine = 30;
       int idx = 0;
       for (int i = 0; i < validCharsLength; i++) {
@@ -110,3 +157,4 @@ bool checkFilenameValidChars(const char* filepath){
 
   return true;
 }
+
