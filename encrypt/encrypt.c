@@ -11,6 +11,7 @@ bool checkPasswordLength(const char* password);
 bool checkFilenameValidChars(const char* filepvath);
 bool checkPasswordValidChars(const char* password);
 bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
+bool checkValidFile(const char* filepath);
 
 int main(int argc, char* argv[]){
 
@@ -37,6 +38,10 @@ int main(int argc, char* argv[]){
   }
 
   if(!checkPasswordValidChars(password)){
+    return 1;
+  }
+
+  if(!checkValidFile(filepath)){
     return 1;
   }
 
@@ -89,7 +94,7 @@ bool checkFilenameValidChars(const char* filepath){
 
 bool checkPasswordValidChars(const char* password){
 
-  char excludeChars[] = "a\"\\ '`";
+  char excludeChars[] = "\"\\ '`";
   int excludeCharsLength = strlen(excludeChars);
 
   int minChar = 32;
@@ -158,3 +163,13 @@ bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel){
   return true;
 }
 
+bool checkValidFile(const char* filepath){
+  // check that opening the file returns a valid file pointer
+  FILE *fptr;
+  fptr = fopen(filepath, "r");
+  if(fptr == NULL){
+    printf("Invalid file path. File not found.\n");
+    return false;
+  }
+  return true;
+}
