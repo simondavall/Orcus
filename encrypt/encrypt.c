@@ -6,12 +6,11 @@ const int MAX_FILEPATH_LENGTH = 128;
 const int MAX_PASSWORD_LENGTH = 20;
 const int MIN_PASSWORD_LENGTH = 8;
 
-bool checkFilepathLength(char* filepath);
-bool checkPasswordLength(char* filepath);
+bool checkFilepathLength(const char* filepath);
+bool checkPasswordLength(const char* password);
+bool checkFilenameValidChars(const char* filepvath);
 
 int main(int argc, char* argv[]){
-
-  printf("Started encryption\n");
 
   // check args
   if (argc < 3) {
@@ -20,11 +19,18 @@ int main(int argc, char* argv[]){
     return 1;
   }
   
-  if (!checkFilepathLength(argv[1])){
+  const char* filepath = argv[1];
+  const char* password = argv[2];
+
+  if (!checkFilepathLength(filepath)){
     return 1;
   }
 
-  if (!checkPasswordLength(argv[2])){
+  if (!checkPasswordLength(password)){
+    return 1;
+  }
+
+  if (!checkFilenameValidChars(filepath)){
     return 1;
   }
 
@@ -33,7 +39,7 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-bool checkFilepathLength(char* filepath){
+bool checkFilepathLength(const char* filepath){
 
   int strLength = strlen(filepath);
 
@@ -50,7 +56,7 @@ bool checkFilepathLength(char* filepath){
   return true;
 }
 
-bool checkPasswordLength(char* password){
+bool checkPasswordLength(const char* password){
 
   int strLength = strlen(password);
 
@@ -67,3 +73,40 @@ bool checkPasswordLength(char* password){
   return true;
 }
 
+
+bool checkFilenameValidChars(const char* filepath){
+
+  char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890()-./:[]_~";
+  int validCharsLength = strlen(validChars);
+  int filepathLength = strlen(filepath);
+  bool charValid = false;
+
+
+  for (int i = 0; i < filepathLength; i++) {
+    charValid = false;
+    for (int j = 0; j < validCharsLength; j++) {
+      if(filepath[i] == validChars[j]){
+        charValid = true;
+        break;
+      }
+    }
+
+    if(!charValid){
+      printf("Password contains invalid characters. The following characters are valid:\n\n\t");
+      int charsPerLine = 30;
+      int idx = 0;
+      for (int i = 0; i < validCharsLength; i++) {
+        if(idx == charsPerLine){
+          idx = 0;
+          printf("\n\t");
+        }
+        printf("%c ", validChars[i]);
+        idx++;
+      }
+      printf("\n\n");
+      return false;
+    }
+  }
+
+  return true;
+}
