@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sodium.h>
 
 const int MAX_FILEPATH_LENGTH = 128;
 const int MAX_PASSWORD_LENGTH = 20;
@@ -14,6 +15,11 @@ bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
 bool checkValidFile(const char* filepath);
 
 int main(int argc, char* argv[]){
+
+  if(sodium_init() == -1){
+    printf("Encryption library failed to initialize.\n");
+    return 1;
+  }
 
   // check args
   if (argc < 3) {
@@ -44,6 +50,10 @@ int main(int argc, char* argv[]){
   if(!checkValidFile(filepath)){
     return 1;
   }
+
+  //todo sdv all tests passed so now encrypt the file.
+  //https://stackoverflow.com/questions/7622617/simply-encrypt-a-string-in-c
+  //have a look at this link
 
   printf("File encrypted successfully.\n");
 
@@ -173,3 +183,4 @@ bool checkValidFile(const char* filepath){
   }
   return true;
 }
+
