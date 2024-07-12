@@ -13,6 +13,8 @@ bool checkFilenameValidChars(const char* filepvath);
 bool checkPasswordValidChars(const char* password);
 bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
 bool checkValidFile(const char* filepath);
+bool encryptFile(const char* filepath, const char* password);
+bool GenerateSecretKey(unsigned char* const key, unsigned long long keyLen, const char* password);
 
 int main(int argc, char* argv[]){
 
@@ -51,9 +53,10 @@ int main(int argc, char* argv[]){
     return 1;
   }
 
-  //todo sdv all tests passed so now encrypt the file.
-  //https://stackoverflow.com/questions/7622617/simply-encrypt-a-string-in-c
-  //have a look at this link
+  //todo sdv change the password into a secret key and zero the password before sending
+  if(!encryptFile(filepath, password)){
+    return 1;
+  }
 
   printf("File encrypted successfully.\n");
 
@@ -184,3 +187,70 @@ bool checkValidFile(const char* filepath){
   return true;
 }
 
+bool encryptFile(const char* filepath, const char* password){
+  #define MESSAGE_PART1 (const unsigned char *) "Arbitrary data to encrypt"
+  #define MESSAGE_PART1_LEN    25
+  #define CIPHERTEXT_PART1_LEN MESSAGE_PART1_LEN + crypto_secretstream_xchacha20poly1305_ABYTES
+
+  #define MESSAGE_PART2 (const unsigned char *) "split into"
+  #define MESSAGE_PART2_LEN    10
+  #define CIPHERTEXT_PART2_LEN MESSAGE_PART2_LEN + crypto_secretstream_xchacha20poly1305_ABYTES
+
+  #define MESSAGE_PART3 (const unsigned char *) "three messages"
+  #define MESSAGE_PART3_LEN    14
+  #define CIPHERTEXT_PART3_LEN MESSAGE_PART3_LEN + crypto_secretstream_xchacha20poly1305_ABYTES
+
+  crypto_secretstream_xchacha20poly1305_state state;
+  unsigned char header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
+  unsigned char c1[CIPHERTEXT_PART1_LEN],
+                c2[CIPHERTEXT_PART2_LEN],
+                c3[CIPHERTEXT_PART3_LEN];
+ 
+  /* Shared secret key required to encrypt/decrypt the stream */
+  unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
+
+  if(!GenerateSecretKey(key, sizeof key, password)){
+    printf("Failed to generate secrity key.\n");
+    return false;
+  }
+
+  /* Set up a new stream: initialize the state and create the header */
+  crypto_secretstream_xchacha20poly1305_init_push(&state, header, key);
+
+  /* Now, encrypt the first chunk. `c1` will contain an encrypted,
+   * authenticated representation of `MESSAGE_PART1`. */
+  crypto_secretstream_xchacha20poly1305_push
+   (&state, c1, NULL, MESSAGE_PART1, MESSAGE_PART1_LEN, NULL, 0, 0);
+
+  /* Encrypt the second chunk. `c2` will contain an encrypted, authenticated
+   * representation of `MESSAGE_PART2`. */
+  crypto_secretstream_xchacha20poly1305_push
+   (&state, c2, NULL, MESSAGE_PART2, MESSAGE_PART2_LEN, NULL, 0, 0);
+
+  /* Encrypt the last chunk, and store the ciphertext into `c3`.
+   * Note the `TAG_FINAL` tag to indicate that this is the final chunk. */
+  crypto_secretstream_xchacha20poly1305_push
+   (&state, c3, NULL, MESSAGE_PART3, MESSAGE_PART3_LEN, NULL, 0,
+    crypto_secretstream_xchacha20poly1305_TAG_FINAL);
+
+  printf("Reached the end of the encryption.\n");
+  return true;
+}
+
+bool GenerateSecretKey(unsigned char* const out, unsigned long long outLen, const char* password){
+
+  unsigned char salt[crypto_pwhash_SALTBYTES];
+
+  randombytes_buf(salt, sizeof salt);
+
+  if (crypto_pwhash
+      (out, outLen, password, strlen(password), salt,
+       crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE,
+       crypto_pwhash_ALG_DEFAULT) != 0) {
+      /* out of memory */
+    printf("Out of memory.\n");
+    return false;
+  }
+
+  return true;
+}
