@@ -53,6 +53,9 @@ int main(int argc, char* argv[]){
     return 1;
   }
 
+  //todo sdv all tests passed so now encrypt the file.
+  //https://stackoverflow.com/questions/7622617/simply-encrypt-a-string-in-c
+  //have a look at this link
   //todo sdv change the password into a secret key and zero the password before sending
   if(!encryptFile(filepath, password)){
     return 1;
