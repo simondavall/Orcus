@@ -3,5 +3,6 @@
 ## Project specific
 build/
 b.sh
-encrypt/encrypt
+encrypt/encrypt_test
+testfile.txt
 
