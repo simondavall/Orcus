@@ -15,6 +15,7 @@ bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
 bool checkValidFile(const char* filepath);
 bool encryptFile(const char* filepath, const char* password);
 bool GenerateSecretKey(unsigned char* const key, unsigned long long keyLen, const char* password);
+void ReadBytes(char *bytesRead, int numBytesRead, FILE *file, const int length);
 
 int main(int argc, char* argv[]){
 
@@ -191,6 +192,52 @@ bool checkValidFile(const char* filepath){
 }
 
 bool encryptFile(const char* filepath, const char* password){
+  FILE * fptr;
+  fptr = fopen(filepath, "r");
+  int length = 512;
+  char bytesRead[length];
+
+  int numBytesRead = length;
+
+  while(numBytesRead == length){
+    // reset counter
+    numBytesRead = 0;
+    // zero the bytes read array
+    for (int i = 0; i < length; i++) {
+      bytesRead[i] = '\0';
+    }
+    // read the bytes from file
+    ReadBytes(bytesRead, numBytesRead, fptr, length);
+
+    // set the bytes up for encryption
+    unsigned char message = bytesRead[numBytesRead];
+    int cipherTextLen = numBytesRead + crypto_secretstream_xchacha20poly1305_ABYTES;
+    unsigned char cipher[cipherTextLen];
+
+    // todo: sdv Step 1: need to encrypt this message and save it to file
+    // Step 2: need to deal with larger files, i.e. loop until number of bytes read is zero.
+    // Then add the last message crypto tag to eht final message and save the loops to file.
+    // May be able to save the progress to file any way.
+    // Edge case: The last read get all the remaining bytes and numBytesRead == length.
+
+  }
+ 
+  printf("The file contents were:\n");
+  int current = 0;
+  while(bytesRead[current] != '\0'){
+    printf("%c", bytesRead[current]);
+    current++;
+
+    if (current > length){
+      printf("Error printing file contents.");
+      break;
+    }
+  }
+  printf("\nNumber of chars printed: %d\n", current);
+
+
+
+
   #define MESSAGE_PART1 (const unsigned char *) "Arbitrary data to encrypt"
   #define MESSAGE_PART1_LEN    25
   #define CIPHERTEXT_PART1_LEN MESSAGE_PART1_LEN + crypto_secretstream_xchacha20poly1305_ABYTES
@@ -256,4 +303,25 @@ bool GenerateSecretKey(unsigned char* const out, unsigned long long outLen, cons
   }
 
   return true;
+}
+
+void ReadBytes(char *bytesRead, int numBytesRead, FILE *file, const int length)
+{
+  int numBytesToRead = length;
+  int check = 0;
+  while (numBytesToRead > 0) {
+    size_t n = fread(bytesRead, sizeof(int) , length, file);
+    if (n == 0) break;
+
+    numBytesRead += n;
+    numBytesToRead -= n;
+
+    if (check++ > 3){
+      // more than three attempts to read all bytes
+      printf("Error reading from file");
+      return;
+    }
+  }
+
+  return;
 }
