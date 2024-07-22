@@ -5,4 +5,5 @@ build/
 b.sh
 encrypt/encrypt_test
 testfile.*
+validation.o
 

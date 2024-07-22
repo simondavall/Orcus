@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sodium.h>
+#include "socrates/validation.h"
 
 const int CHUNK_SIZE = 4096;
 
@@ -10,8 +11,8 @@ const int MAX_FILEPATH_LENGTH = 128;
 const int MAX_PASSWORD_LENGTH = 20;
 const int MIN_PASSWORD_LENGTH = 8;
 
-bool checkFilepathLength(const char* filepath);
-bool checkPasswordLength(const char* password);
+//bool checkFilepathLength(const char* filepath);
+//bool checkPasswordLength(const char* password);
 bool checkFilenameValidChars(const char* filepvath);
 bool checkPasswordValidChars(const char* password);
 bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
@@ -38,11 +39,11 @@ int main(int argc, char* argv[]){
   const char* filepath = argv[1];
   const char* password = argv[2];
 
-  if (!checkFilepathLength(filepath)){
+  if (!checkFilepathLength(filepath, MAX_FILEPATH_LENGTH)){
     return 1;
   }
 
-  if (!checkPasswordLength(password)){
+  if (!checkPasswordLength(password, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH)){
     return 1;
   }
 
@@ -70,41 +71,6 @@ int main(int argc, char* argv[]){
 
   return 0;
 }
-
-bool checkFilepathLength(const char* filepath){
-
-  int strLength = strlen(filepath);
-
-  if(strLength == 0){
-    printf("<filepath> has zero length.\n");
-    return false;
-  }  
-  
-  if(strLength > MAX_FILEPATH_LENGTH){
-    printf("<filepath> has too many characters. Max length: %d\n", MAX_FILEPATH_LENGTH);
-    return false;
-  }
-
-  return true;
-}
-
-bool checkPasswordLength(const char* password){
-
-  int strLength = strlen(password);
-
-  if(strLength < MIN_PASSWORD_LENGTH){
-    printf("<password> has too few characters. Min length: %d\n", MIN_PASSWORD_LENGTH);
-    return false;
-  }  
-  
-  if(strLength > MAX_PASSWORD_LENGTH){
-    printf("<password> has too many characters. Max length: %d\n", MAX_PASSWORD_LENGTH);
-    return false;
-  }
-
-  return true;
-}
-
 
 bool checkFilenameValidChars(const char* filepath){
 
