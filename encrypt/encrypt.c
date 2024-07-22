@@ -11,16 +11,9 @@ const int MAX_FILEPATH_LENGTH = 128;
 const int MAX_PASSWORD_LENGTH = 20;
 const int MIN_PASSWORD_LENGTH = 8;
 
-//bool checkFilepathLength(const char* filepath);
-//bool checkPasswordLength(const char* password);
-bool checkFilenameValidChars(const char* filepvath);
-bool checkPasswordValidChars(const char* password);
-bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
-bool checkValidFile(const char* filepath);
 bool encryptFile(const char* filepath, const char* password);
 static bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
 bool GenerateSecretKey(unsigned char* const key, unsigned long long keyLen, const char* password);
-void ReadBytes(char *bytesRead, int numBytesRead, FILE *file, const int length);
 
 int main(int argc, char* argv[]){
 
@@ -62,7 +55,7 @@ int main(int argc, char* argv[]){
   //todo sdv all tests passed so now encrypt the file.
   //https://stackoverflow.com/questions/7622617/simply-encrypt-a-string-in-c
   //have a look at this link
-//todo sdv change the password into a secret key and zero the password before sending
+  //todo: sdv change the password into a secret key and zero the password before sending
   if(!encryptFile(filepath, password)){
     return 1;
   }
@@ -70,95 +63,6 @@ int main(int argc, char* argv[]){
   printf("File encrypted successfully.\n");
 
   return 0;
-}
-
-bool checkFilenameValidChars(const char* filepath){
-
-  char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890()-./:[]_~";
-
-  return checkValid(validChars, filepath, "<filepath>");
-}
-
-bool checkPasswordValidChars(const char* password){
-
-  char excludeChars[] = "\"\\ '`";
-  int excludeCharsLength = strlen(excludeChars);
-
-  int minChar = 32;
-  int maxChar = 127;
-
-  char buffer[maxChar];
-
-  int idx = 0;
-  bool isValidChar = true;
-
-  for (int i = minChar; i < maxChar; i++) {
-    for(int j = 0; j < excludeCharsLength; j++){
-      if(i == (int)excludeChars[j]){
-        isValidChar = false;
-        break;
-      }
-    }
-    if(isValidChar){
-      buffer[idx] = (char)i;
-      idx++;
-    }
-    isValidChar = true;
-  }
-
-  buffer[idx] = '\0';
-
-  char validChars[idx];
-  strcpy(validChars, buffer);
-
-  return checkValid(validChars, password, "<password>");
-}
-
-
-bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel){
-  int stringLength = strlen(toBeChecked);
-  int validCharsLength = strlen(validChars);
-
-  bool charValid = false;
-
-  for (int i = 0; i < stringLength; i++) {
-    charValid = false;
-    for (int j = 0; j < validCharsLength; j++) {
-      if(toBeChecked[i] == validChars[j]){
-        charValid = true;
-        break;
-      }
-    }
-
-    if(!charValid){
-      printf("%s contains invalid characters. The following characters are valid:\n\n\t", messageLabel);
-      int charsPerLine = 30;
-      int idx = 0;
-      for (int i = 0; i < validCharsLength; i++) {
-        if(idx == charsPerLine){
-          idx = 0;
-          printf("\n\t");
-        }
-        printf("%c ", validChars[i]);
-        idx++;
-      }
-      printf("\n\n");
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool checkValidFile(const char* filepath){
-  // check that opening the file returns a valid file pointer
-  FILE *fptr;
-  fptr = fopen(filepath, "r");
-  if(fptr == NULL){
-    printf("Invalid file path. File not found.\n");
-    return false;
-  }
-  return true;
 }
 
 static bool 
