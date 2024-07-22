@@ -3,16 +3,14 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sodium.h>
+#include "socrates/encryption.h"
 #include "socrates/validation.h"
-
-const int CHUNK_SIZE = 4096;
 
 const int MAX_FILEPATH_LENGTH = 128;
 const int MAX_PASSWORD_LENGTH = 20;
 const int MIN_PASSWORD_LENGTH = 8;
 
 bool encryptFile(const char* filepath, const char* password);
-static bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
 bool GenerateSecretKey(unsigned char* const key, unsigned long long keyLen, const char* password);
 
 int main(int argc, char* argv[]){
@@ -52,10 +50,6 @@ int main(int argc, char* argv[]){
     return 1;
   }
 
-  //todo sdv all tests passed so now encrypt the file.
-  //https://stackoverflow.com/questions/7622617/simply-encrypt-a-string-in-c
-  //have a look at this link
-  //todo: sdv change the password into a secret key and zero the password before sending
   if(!encryptFile(filepath, password)){
     return 1;
   }
@@ -63,38 +57,6 @@ int main(int argc, char* argv[]){
   printf("File encrypted successfully.\n");
 
   return 0;
-}
-
-static bool 
-encrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
-
-  unsigned char buf_in[CHUNK_SIZE];
-  unsigned char buf_out[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
-  unsigned char header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
-  crypto_secretstream_xchacha20poly1305_state state;
-  FILE *fptr_s, *fptr_t;
-  unsigned long long out_len;
-  size_t rlen;
-  int eof;
-  unsigned char tag;
-
-  fptr_s = fopen(sourceFile, "rb");
-  fptr_t = fopen(targetFile, "wb");
-
-  crypto_secretstream_xchacha20poly1305_init_push(&state, header, key);
-  fwrite(header, 1, sizeof header, fptr_t);
-  do{
-    rlen = fread(buf_in, 1, sizeof buf_in, fptr_s);
-    eof = feof(fptr_s);
-    tag = eof ? crypto_secretstream_xchacha20poly1305_TAG_FINAL : 0;
-    crypto_secretstream_xchacha20poly1305_push(&state, buf_out, &out_len, buf_in, rlen, NULL, 0, tag);
-    fwrite(buf_out, 1, (size_t) out_len, fptr_t);
-  } while(!eof);
-  fclose(fptr_t);
-  fclose(fptr_s);
-
-  return true;
-
 }
 
 bool encryptFile(const char *filepath, const char *password){
