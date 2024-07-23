@@ -5,9 +5,44 @@
 #include <stdio.h>
 #include "validation.h"
 
+bool checkFilepathLength(const char* filepath, const int maxLength);
+bool checkPasswordLength(const char* password, const int minLength, const int maxLength);
+bool checkFilenameValidChars(const char* filepath);
+bool checkPasswordValidChars(const char* password);
+bool checkValidFile(const char* filepath);
 bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel);
- 
+
 // todo: need to return error codes rather than printf statements
+
+bool validateFilePath(const char *filepath, int maxLength){
+  
+  if (!checkFilepathLength(filepath, maxLength)){
+    return 1;
+  }
+
+  if (!checkFilenameValidChars(filepath)){
+    return false;
+  }
+
+  if(!checkValidFile(filepath)){
+    return false;
+  }
+
+  return true;
+}
+
+bool validatePassword(const char *password, int minLength, int maxLength){
+
+  if (!checkPasswordLength(password, minLength, maxLength)){
+    return false;
+  }
+
+  if(!checkPasswordValidChars(password)){
+    return false;
+  }
+
+  return true;
+}
 
 bool checkFilepathLength(const char* filepath, const int maxLength){
 

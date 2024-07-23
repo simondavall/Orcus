@@ -6,6 +6,9 @@
 #include <string.h>
 #include "encryption.h"
 
+bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
+bool GenerateSecretKey(unsigned char* const out, unsigned long long outLen, const char* password);
+
 const int CHUNK_SIZE = 4096;
 
 bool encryptFile(const char *filepath, const char *password){

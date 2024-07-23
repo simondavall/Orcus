@@ -27,23 +27,11 @@ int main(int argc, char* argv[]){
   const char* filepath = argv[1];
   const char* password = argv[2];
 
-  if (!checkFilepathLength(filepath, MAX_FILEPATH_LENGTH)){
+  if (!validateFilePath(filepath, MAX_FILEPATH_LENGTH)){
     return 1;
   }
 
-  if (!checkPasswordLength(password, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH)){
-    return 1;
-  }
-
-  if (!checkFilenameValidChars(filepath)){
-    return 1;
-  }
-
-  if(!checkPasswordValidChars(password)){
-    return 1;
-  }
-
-  if(!checkValidFile(filepath)){
+  if (!validatePassword(password, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH)){
     return 1;
   }
 
