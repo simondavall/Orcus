@@ -23,3 +23,8 @@ To test the main build
 3. Navigate to /build folder
 4. Run using ./encrypt textfile.txt password
 
+
+Wish List / Issues
+1. Remove backing up feature during encrypt process when it works.
+2. What to do about forgotten password? Email? Master password?
+3. Need to consider user salt value.
