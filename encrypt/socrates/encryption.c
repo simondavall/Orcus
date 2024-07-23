@@ -52,6 +52,17 @@ bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char
   } while(!eof);
   fclose(fptr_t);
   fclose(fptr_s);
+  
+  char backupFilepath[strlen(sourceFile) + 4];
+  strcpy(backupFilepath, sourceFile);
+  strcat(backupFilepath, ".bak");
+
+  // todo: sdv move this to a proper place (maybe the calling function)
+  // and rework. These functions all have return values that should be
+  // used.
+  remove(backupFilepath);
+  rename(sourceFile, backupFilepath);
+  rename(targetFile, sourceFile);
 
   return true;
 }
@@ -115,11 +126,24 @@ ret:
     fclose(fptr_t);
     fclose(fptr_s);
 
+  // todo: sdv uncomment these lines to remove the backup file
+  // that was created during encryption.
+  // char backupFilepath[strlen(sourceFile) + 4];
+  // strcpy(backupFilepath, sourceFile);
+  // strcat(backupFilepath, ".bak");
+
+  //remove(backupFilepath);
+  remove(sourceFile);
+  rename(targetFile, sourceFile);
+
   return true;
 }
 
 bool GenerateSecretKey(unsigned char* key, const char* password){
 
+  // todo: sdv need to rework this hardcoded feature. It needs to
+  // stay constant for each user in order to recreate the key that
+  // was used to encrypt the file for decryption.
   unsigned char salt[crypto_pwhash_SALTBYTES] = "123456789012345";
   //randombytes_buf(salt, sizeof salt);
 
