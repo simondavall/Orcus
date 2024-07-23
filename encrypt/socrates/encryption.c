@@ -12,16 +12,12 @@ const int CHUNK_SIZE = 4096;
 
 bool encryptFile(const char *filepath, const char *password){
 
-  /* Shared secret key required to encrypt/decrypt the stream */
-  //unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
   unsigned char *key;
 
   if(!GenerateSecretKey(key, password)){
     printf("Failed to generate secrity key.\n");
     return false;
   }
-
-  printf("Key generated %s\n", key);
 
   char targetFilepath[strlen(filepath) + 4];
   strcpy(targetFilepath, filepath);
@@ -62,17 +58,13 @@ bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char
 
 bool decryptFile(const char *filepath, const char *password){
 
-  /* Shared secret key required to encrypt/decrypt the stream */
-  //unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
   unsigned char *key;
-
 
   if(!GenerateSecretKey(key, password)){
     printf("Failed to generate secrity key.\n");
     return false;
   }
 
-  printf("Key generated: %s\n", key);
   char targetFilepath[strlen(filepath) + 4];
   strcpy(targetFilepath, filepath);
   strcat(targetFilepath, ".decrypt");
@@ -137,8 +129,7 @@ bool GenerateSecretKey(unsigned char* key, const char* password){
       (out, sizeof out, password, strlen(password), salt,
        crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE,
        crypto_pwhash_ALG_DEFAULT) != 0) {
-      /* out of memory */
-    printf("Out of memory.\n");
+    printf("Failed to generate secure key\n");
     return false;
   }
 

@@ -157,7 +157,7 @@ bool checkValid(char* validChars, const char* toBeChecked, char* messageLabel){
 }
 
 bool checkValidFile(const char* filepath){
-  // check that opening the file returns a valid file pointer
+  // check that the file exists
   FILE *fptr;
   fptr = fopen(filepath, "r");
   if(fptr == NULL){
