@@ -1,35 +1,31 @@
-#include <sodium/crypto_pwhash.h>
-#include <sodium/crypto_secretstream_xchacha20poly1305.h>
-#include <sodium/randombytes.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sodium.h>
 #include "encryption.h"
 
 bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
 bool decrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
-bool GenerateSecretKey(unsigned char* const out, unsigned long long outLen, const char* password);
+bool GenerateSecretKey(unsigned char* key, const char* password);
 
 const int CHUNK_SIZE = 4096;
 
 bool encryptFile(const char *filepath, const char *password){
 
   /* Shared secret key required to encrypt/decrypt the stream */
-  unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
+  //unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
+  unsigned char *key;
 
-  if(!GenerateSecretKey(key, sizeof key, password)){
+  if(!GenerateSecretKey(key, password)){
     printf("Failed to generate secrity key.\n");
     return false;
   }
 
+  printf("Key generated %s\n", key);
+
   char targetFilepath[strlen(filepath) + 4];
   strcpy(targetFilepath, filepath);
   strcat(targetFilepath, ".encrypt");
-
-  // create or open/truncate the file to hold encrypted data 
-  // FILE *encryptedfptr;
-  // encryptedfptr = fopen(targetFilepath, "w");
-  // fclose(encryptedfptr);
 
   return encrypt(targetFilepath, filepath, key);
 }
@@ -67,22 +63,19 @@ bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char
 bool decryptFile(const char *filepath, const char *password){
 
   /* Shared secret key required to encrypt/decrypt the stream */
-  unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
+  //unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
+  unsigned char *key;
 
-  if(!GenerateSecretKey(key, sizeof key, password)){
+
+  if(!GenerateSecretKey(key, password)){
     printf("Failed to generate secrity key.\n");
     return false;
   }
 
+  printf("Key generated: %s\n", key);
   char targetFilepath[strlen(filepath) + 4];
   strcpy(targetFilepath, filepath);
   strcat(targetFilepath, ".decrypt");
-
-  // create or open/truncate the file to hold encrypted data 
-  // todo: sdv might not need to do this as done in encrypt function
-  //FILE *encryptedfptr;
-  // encryptedfptr = fopen(targetFilepath, "w");
-  // fclose(encryptedfptr);
 
   return decrypt(targetFilepath, filepath, key);
 }
@@ -133,15 +126,15 @@ ret:
   return true;
 }
 
+bool GenerateSecretKey(unsigned char* key, const char* password){
 
-bool GenerateSecretKey(unsigned char* const out, unsigned long long outLen, const char* password){
+  unsigned char salt[crypto_pwhash_SALTBYTES] = "123456789012345";
+  //randombytes_buf(salt, sizeof salt);
 
-  unsigned char salt[crypto_pwhash_SALTBYTES];
-
-  randombytes_buf(salt, sizeof salt);
+  unsigned char out[crypto_box_SEEDBYTES];
 
   if (crypto_pwhash
-      (out, outLen, password, strlen(password), salt,
+      (out, sizeof out, password, strlen(password), salt,
        crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE,
        crypto_pwhash_ALG_DEFAULT) != 0) {
       /* out of memory */
@@ -149,6 +142,7 @@ bool GenerateSecretKey(unsigned char* const out, unsigned long long outLen, cons
     return false;
   }
 
+  key = out;
   return true;
 }
 
