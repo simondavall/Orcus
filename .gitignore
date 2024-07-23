@@ -4,6 +4,7 @@
 build/
 b.sh
 encrypt/encrypt_test
+encrypt/decrypt_test
 testfile.*
 validation.o
 encryption.o
