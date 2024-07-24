@@ -6,7 +6,7 @@
 
 bool encrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
 bool decrypt(const char *targetFile, const char *sourceFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
-bool verifyEncryption(const char *encryptedFile, const char *originalFile, const char *password);
+bool verifyEncryption(const char *encryptedFile, const char *originalFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
 bool compareFiles(FILE *file1, FILE *file2);
 bool GenerateSecretKey(unsigned char* key, const char* password);
 
@@ -31,7 +31,7 @@ bool encryptFile(const char *filepath, const char *password){
     return false;
   }
 
-  if(!verifyEncryption(targetFilepath, filepath, password)){
+  if(!verifyEncryption(targetFilepath, filepath, key)){
     remove(targetFilepath);
     return false;
   }
@@ -148,26 +148,18 @@ ret:
   return true;
 }
 
-bool verifyEncryption(const char *encryptedFile, const char *originalFile, const char *password){
+bool verifyEncryption(const char *encryptedFile, const char *originalFile, const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]){
   // decrypt the encrypted file and verify that is is the same as the original
   char tempFilepath[strlen(encryptedFile) + 4];
   strcpy(tempFilepath, encryptedFile);
   strcat(tempFilepath, ".ver");
   bool ret = true;
 
-  unsigned char *key;
-/*
-  if(!GenerateSecretKey(key, password)){
-    printf("Failed to generate security key during verification.\n");
-    return false;
-  }
-/*
   if(!decrypt(tempFilepath, encryptedFile, key)){
     printf("Failed to decrypt file correctly during verification process\n");
     remove(tempFilepath);
     return false;
   }
-/*
   // check decrypted file against original
   FILE *fptr_orig = fopen(originalFile, "r");
   FILE *fptr_temp = fopen(tempFilepath, "r");
@@ -188,7 +180,6 @@ ret:
   fclose(fptr_orig);
   fclose(fptr_temp);
 
-*/
   return ret;
 }
 
@@ -221,7 +212,8 @@ bool GenerateSecretKey(unsigned char* key, const char* password){
 
   if (crypto_pwhash
       (out, sizeof out, password, strlen(password), salt,
-       crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE,
+       crypto_pwhash_OPSLIMIT_INTERACTIVE,
+       crypto_pwhash_MEMLIMIT_INTERACTIVE,
        crypto_pwhash_ALG_DEFAULT) != 0) {
     printf("Failed to generate secure key\n");
     return false;
