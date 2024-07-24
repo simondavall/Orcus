@@ -25,7 +25,7 @@ To test the main build
 
 
 Wish List / Issues
-1. Remove backing up feature during encrypt process when it works.
-2. What to do about forgotten password? Email? Master password?
+1. -Completed- Remove backing up feature during encrypt process when it works.
+2. What to do bout forgotten password? Email? Master password?
 3. Need to consider user salt value.
 4. Add tests
