@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <sodium.h>
-#include "socrates/encryption.h"
-#include "socrates/validation.h"
+#include "orcus/encryption.h"
+#include "orcus/validation.h"
 
 const int MAX_FILEPATH_LENGTH = 128;
 const int MAX_PASSWORD_LENGTH = 20;
