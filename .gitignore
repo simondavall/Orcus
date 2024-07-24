@@ -3,9 +3,9 @@
 ## Project specific
 build/
 b.sh
-encrypt/encrypt_test
-encrypt/decrypt_test
-encrypt/password*
+src/encrypt_test
+src/decrypt_test
+src/password*
 testfile*
 validation.o
 encryption.o
