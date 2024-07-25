@@ -40,7 +40,7 @@ this will encrypt the test text file.
 
 will decrypt the file back to plain text.
 
-### Wish List / Issues
+## Wish List / Issues
 - ~~Remove backing up feature during encrypt process when it works.~~
 - What to do about forgotten password? Email? Master password?
 - Need to consider user salt value.
