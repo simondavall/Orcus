@@ -1,4 +1,3 @@
-#include <sodium/crypto_secretstream_xchacha20poly1305.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <sodium.h>
