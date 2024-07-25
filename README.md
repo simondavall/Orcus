@@ -14,6 +14,8 @@ A Windows installation has not yet been created, but may well work if the execut
 3. This places the executables in the usr/local/bin directory.
 4. Make sure usr/local/bin is included in the PATH env variables.
 
+To install **libsodium** refer to the installation section at https://doc.libsodium.org/
+
 ## Usage
 
 To encrypt a file:
