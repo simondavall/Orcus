@@ -18,11 +18,11 @@ A Windows installation has not yet been created, but may well work if the execut
 
 To encrypt a file:
 
-    ``` encrypt <filepath> <password>```
+     encrypt <filepath> <password>
 
 To decrypt a file:
 
-    ``` decrypt <filepath> <password>```
+     decrypt <filepath> <password>
 
 Note: Adding a space before the command will prevent it being added to the shell command history (if this option is set in your shell), and hence not expose the password in plain text.
 
@@ -32,11 +32,11 @@ There is a build in the root dir ```./build.sh``` which compiles encrypt.c and d
 
 Navigate to the build folder and test the executalbe as follows:
 
-    ```./encrypt testtile.txt password```
+    ./encrypt testtile.txt password
 
 this will encrypt the test text file.
 
-    ```./decrypt testfile.txt password```
+    ./decrypt testfile.txt password
 
 will decrypt the file back to plain text.
 
